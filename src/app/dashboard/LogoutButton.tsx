@@ -8,9 +8,9 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 const logoutStyle: React.CSSProperties = {
   padding: "0.375rem 0.75rem",
   fontSize: "0.875rem",
-  background: "transparent",
-  color: "#a3a3a3",
-  border: "1px solid #404040",
+  background: "#dc2626",
+  color: "#fff",
+  border: "none",
   borderRadius: "8px",
   cursor: "pointer",
   transition: "150ms ease",
