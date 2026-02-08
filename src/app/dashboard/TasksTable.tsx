@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDate, formatDateTime, toDateInputValue } from "@/lib/format";
 import { COLUMN_LABELS, FORM_COLUMNS } from "@/lib/taskColumns";
@@ -42,6 +42,21 @@ const actionsButtonStyle: React.CSSProperties = {
 };
 
 const actionsMenuStyle: React.CSSProperties = {
+  position: "absolute",
+  right: 0,
+  bottom: "100%",
+  marginBottom: "2px",
+  background: "rgba(23, 23, 23, 0.95)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(64, 64, 64, 0.6)",
+  borderRadius: "8px",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+  zIndex: 9999,
+  minWidth: "8rem",
+};
+
+const deploySortMenuStyle: React.CSSProperties = {
   position: "absolute",
   right: 0,
   top: "100%",
@@ -98,11 +113,15 @@ export function TasksTable({
   columns,
   columnLabels,
   secondaryColumns,
+  view,
+  sort,
 }: {
   rows: Row[];
   columns: string[];
   columnLabels: Record<string, string>;
   secondaryColumns: string[];
+  view?: "30days" | "all";
+  sort?: "newest" | "oldest";
 }) {
   const router = useRouter();
   const [editingRow, setEditingRow] = useState<Row | null>(null);
@@ -110,8 +129,20 @@ export function TasksTable({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [deploySortMenuOpen, setDeploySortMenuOpen] = useState(false);
   const firstEditInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const deploySortMenuRef = useRef<HTMLDivElement>(null);
+
+  const sortedRows = useMemo(() => {
+    if (view !== "all" || !sort || !rows.length) return rows;
+    const col = "deployment_date";
+    return [...rows].sort((a, b) => {
+      const va = a[col] != null ? new Date(String(a[col])).getTime() : 0;
+      const vb = b[col] != null ? new Date(String(b[col])).getTime() : 0;
+      return sort === "newest" ? vb - va : va - vb;
+    });
+  }, [rows, view, sort]);
 
   useEffect(() => {
     if (editingRow && firstEditInputRef.current) {
@@ -130,6 +161,20 @@ export function TasksTable({
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [openMenuKey]);
+
+  useEffect(() => {
+    if (!deploySortMenuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        deploySortMenuRef.current &&
+        !deploySortMenuRef.current.contains(e.target as Node)
+      ) {
+        setDeploySortMenuOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [deploySortMenuOpen]);
 
   async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -255,7 +300,7 @@ export function TasksTable({
                   cursor: "pointer",
                 }}
               >
-                Cancel
+                Dismiss
               </button>
             </div>
           </form>
@@ -267,11 +312,73 @@ export function TasksTable({
       >
         <thead>
           <tr style={{ background: "#171717" }}>
-            {columns.map((col) => (
-              <th key={col} style={thStyle(col)}>
-                {getLabel(col)}
-              </th>
-            ))}
+            {columns.map((col) => {
+              const isDeployDate = col === "deployment_date";
+              const canSort = view === "all" && isDeployDate;
+              return (
+                <th key={col} style={thStyle(col)}>
+                  {canSort ? (
+                    <div
+                      ref={deploySortMenuOpen ? deploySortMenuRef : undefined}
+                      style={{ position: "relative", display: "inline-block" }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeploySortMenuOpen((prev) => !prev)
+                        }
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: 0,
+                          font: "inherit",
+                          color: "inherit",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                        }}
+                        aria-expanded={deploySortMenuOpen}
+                        aria-haspopup="true"
+                      >
+                        {getLabel(col)}
+                        <span aria-hidden>▾</span>
+                      </button>
+                      {deploySortMenuOpen && (
+                        <div style={deploySortMenuStyle}>
+                          {sort === "oldest" && (
+                            <button
+                              type="button"
+                              style={actionsMenuItemStyle}
+                              onClick={() => {
+                                router.push("/dashboard?view=all&sort=newest");
+                                setDeploySortMenuOpen(false);
+                              }}
+                            >
+                              Sort by newest first
+                            </button>
+                          )}
+                          {sort !== "oldest" && (
+                            <button
+                              type="button"
+                              style={actionsMenuItemStyle}
+                              onClick={() => {
+                                router.push("/dashboard?view=all&sort=oldest");
+                                setDeploySortMenuOpen(false);
+                              }}
+                            >
+                              Sort by oldest first
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    getLabel(col)
+                  )}
+                </th>
+              );
+            })}
             <th style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: "#171717", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", fontWeight: 600, fontSize: "0.875rem", color: "#a3a3a3" }}>Actions</th>
           </tr>
         </thead>
@@ -286,7 +393,7 @@ export function TasksTable({
               </td>
             </tr>
           )}
-          {rows.map((row, i) => {
+          {sortedRows.map((row, i) => {
             const rowKey =
               typeof row.id === "string" || typeof row.id === "number"
                 ? row.id

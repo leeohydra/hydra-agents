@@ -36,7 +36,7 @@ export const SECONDARY_COLUMNS = ["created_at", "updated_at"];
 
 export const FORM_FIELD_GROUPS: { title: string; fields: readonly string[] }[] = [
   { title: "Project", fields: ["project", "assigned_agent", "deployment_date"] },
-  { title: "Jurisdiction", fields: ["jurisdiction_country", "jurisdiction_city"] },
+  { title: "Jurisdiction", fields: ["jurisdiction_city", "jurisdiction_country"] },
   { title: "Client & inquiry", fields: ["inquiry_via", "client_name", "contacts", "comms_channel"] },
   { title: "Commercial", fields: ["dd_doc", "pay"] },
 ];

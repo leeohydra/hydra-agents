@@ -28,10 +28,16 @@ const pageTitleStyle: React.CSSProperties = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; view?: string }>;
+  searchParams: Promise<{ saved?: string; view?: string; sort?: string }>;
 }) {
   const params = await searchParams;
   const view = params.view === "all" ? "all" : "30days";
+  const sort =
+    params.sort === "oldest"
+      ? "oldest"
+      : params.sort === "newest"
+        ? "newest"
+        : undefined;
   const tasks = await fetchTasks(
     view === "30days" ? { lastNDays: 30 } : undefined
   );
@@ -58,6 +64,8 @@ export default async function DashboardPage({
           columns={columns}
           columnLabels={COLUMN_LABELS}
           secondaryColumns={SECONDARY_COLUMNS}
+          view={view}
+          sort={sort}
         />
       </div>
     </DashboardShell>
