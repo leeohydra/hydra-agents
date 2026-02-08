@@ -74,6 +74,41 @@ const linkStyle: React.CSSProperties = {
   marginTop: "0.5rem",
 };
 
+const passwordInputWrapperStyle: React.CSSProperties = {
+  position: "relative",
+  display: "flex",
+  alignItems: "stretch",
+};
+
+const eyeButtonStyle: React.CSSProperties = {
+  position: "absolute",
+  right: "0.5rem",
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  padding: "0.25rem",
+  cursor: "pointer",
+  color: "#a3a3a3",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+function EyeIcon({ show }: { show: boolean }) {
+  return show ? (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [ready, setReady] = useState<boolean | null>(null);
@@ -82,6 +117,8 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -168,33 +205,55 @@ export default function ResetPasswordPage() {
           <label htmlFor="password" style={labelStyle}>
             New password
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            placeholder="At least 6 characters"
-            style={inputStyle}
-            autoComplete="new-password"
-          />
+          <div style={passwordInputWrapperStyle}>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="At least 6 characters"
+              style={{ ...inputStyle, paddingRight: "2.5rem" }}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              style={eyeButtonStyle}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              <EyeIcon show={!showPassword} />
+            </button>
+          </div>
         </div>
         <div style={fieldStyle}>
           <label htmlFor="confirmPassword" style={labelStyle}>
             Confirm password
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            minLength={6}
-            placeholder="Same as above"
-            style={inputStyle}
-            autoComplete="new-password"
-          />
+          <div style={passwordInputWrapperStyle}>
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="Same as above"
+              style={{ ...inputStyle, paddingRight: "2.5rem" }}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((p) => !p)}
+              style={eyeButtonStyle}
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              <EyeIcon show={!showConfirmPassword} />
+            </button>
+          </div>
         </div>
         {error && <p style={errorStyle}>{error}</p>}
         {successMessage && <p style={successStyle}>{successMessage}</p>}
