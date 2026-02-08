@@ -5,25 +5,13 @@ import {
 } from "@/lib/taskColumns";
 import { fetchTasks, TASK_TABLE_COLUMNS } from "@/lib/tasks";
 import { AddTaskSection } from "./AddTaskSection";
+import { DashboardPageBar } from "./DashboardPageBar";
 import { DashboardShell } from "./DashboardShell";
+import { DashboardTableWrapper } from "./DashboardTableWrapper";
 import { DashboardViewControl } from "./DashboardViewControl";
 import { FlashMessage } from "./FlashMessage";
 import { LogoutButton } from "./LogoutButton";
 import { TasksTable } from "./TasksTable";
-
-const pageBarStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "1.5rem",
-};
-
-const pageTitleStyle: React.CSSProperties = {
-  margin: 0,
-  fontSize: "1.5rem",
-  fontWeight: 600,
-  color: "#fafafa",
-};
 
 export default async function DashboardPage({
   searchParams,
@@ -52,13 +40,10 @@ export default async function DashboardPage({
 
   return (
     <DashboardShell logout={<LogoutButton />}>
-      <div style={pageBarStyle}>
-        <h1 style={pageTitleStyle}>Tasks</h1>
-        <AddTaskSection />
-      </div>
+      <DashboardPageBar title="Tasks" actions={<AddTaskSection />} />
       {params.saved === "1" && <FlashMessage />}
       <DashboardViewControl view={view} />
-      <div style={{ overflowX: "auto" }}>
+      <DashboardTableWrapper>
         <TasksTable
           rows={rows}
           columns={columns}
@@ -67,7 +52,7 @@ export default async function DashboardPage({
           view={view}
           sort={sort}
         />
-      </div>
+      </DashboardTableWrapper>
     </DashboardShell>
   );
 }

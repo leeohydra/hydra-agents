@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import { useRouter } from "next/navigation";
 import { formatDate, formatDateTime, toDateInputValue } from "@/lib/format";
 import { COLUMN_LABELS, FORM_COLUMNS } from "@/lib/taskColumns";
@@ -223,14 +224,23 @@ export function TasksTable({
     setEditingRow(row);
   }
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const getLabel = (col: string) => columnLabels[col] ?? col;
 
-  const tableCellStyle: React.CSSProperties = {
-    padding: "0.5rem 0.75rem",
-    borderBottom: "1px solid rgba(64, 64, 64, 0.5)",
-    verticalAlign: "top",
-    color: "#fafafa",
-  };
+  const tableCellStyle: React.CSSProperties = isMobile
+    ? {
+        padding: "0.35rem 0.5rem",
+        borderBottom: "1px solid rgba(64, 64, 64, 0.5)",
+        verticalAlign: "top",
+        color: "#fafafa",
+        fontSize: "0.8125rem",
+      }
+    : {
+        padding: "0.5rem 0.75rem",
+        borderBottom: "1px solid rgba(64, 64, 64, 0.5)",
+        verticalAlign: "top",
+        color: "#fafafa",
+      };
 
   const thStyle = (col: string): React.CSSProperties => ({
     ...tableCellStyle,
@@ -273,7 +283,13 @@ export function TasksTable({
               defaultValues={editingRow}
               firstInputRef={firstEditInputRef}
             />
-            <div style={formActionsStyle}>
+            <div
+              style={
+                isMobile
+                  ? { ...formActionsStyle, flexDirection: "column" }
+                  : formActionsStyle
+              }
+            >
               <button
                 type="submit"
                 disabled={isSaving || !isDirty}

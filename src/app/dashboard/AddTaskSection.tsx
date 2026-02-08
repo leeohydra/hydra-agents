@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import { addTask } from "./actions";
 import { toDateInputValue } from "@/lib/format";
 import { FORM_COLUMNS } from "@/lib/taskColumns";
@@ -32,6 +33,7 @@ FORM_COLUMNS.forEach((col) => {
 });
 
 export function AddTaskSection() {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [showForm, setShowForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -70,11 +72,11 @@ export function AddTaskSection() {
   }
 
   return (
-    <div>
+    <div style={isMobile ? { width: "100%" } : undefined}>
       <button
         type="button"
         onClick={() => setShowForm(true)}
-        style={primaryButtonStyle}
+        style={isMobile ? { ...primaryButtonStyle, width: "100%", padding: "0.5rem 1rem" } : primaryButtonStyle}
       >
         Add task
       </button>
@@ -104,7 +106,13 @@ export function AddTaskSection() {
           }}
         >
           <TaskFormFields mode="add" firstInputRef={firstInputRef} />
-          <div style={formActionsStyle}>
+          <div
+            style={
+              isMobile
+                ? { ...formActionsStyle, flexDirection: "column" }
+                : formActionsStyle
+            }
+          >
             <button
               type="submit"
               disabled={isSaving || !isDirty}

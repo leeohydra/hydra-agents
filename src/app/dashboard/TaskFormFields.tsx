@@ -1,6 +1,7 @@
 "use client";
 
 import { RefObject } from "react";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import { FORM_FIELD_GROUPS, COLUMN_LABELS } from "@/lib/taskColumns";
 import { toDateInputValue } from "@/lib/format";
 
@@ -59,15 +60,23 @@ export function TaskFormFields({
   defaultValues?: Row;
   firstInputRef?: RefObject<HTMLInputElement | null>;
 }) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const getLabel = (col: string) => COLUMN_LABELS[col] ?? col;
   let first = true;
 
+  const gridStyle = isMobile
+    ? { ...formGridStyle, gridTemplateColumns: "1fr", gap: "1rem" }
+    : formGridStyle;
+  const fieldsRowStyle = isMobile
+    ? { display: "grid" as const, gridTemplateColumns: "1fr", gap: "0 0" }
+    : { display: "grid" as const, gridTemplateColumns: "1fr 1fr", gap: "0 2rem" };
+
   return (
-    <div style={formGridStyle}>
+    <div style={gridStyle}>
       {FORM_FIELD_GROUPS.map((group) => (
         <div key={group.title} style={{ gridColumn: "1 / -1", ...groupStyle }}>
           <div style={groupTitleStyle}>{group.title}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 2rem" }}>
+          <div style={fieldsRowStyle}>
             {group.fields.map((col) => {
               const isDate = col === "deployment_date";
               const ref = first ? firstInputRef : undefined;

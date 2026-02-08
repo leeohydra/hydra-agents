@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
@@ -54,6 +55,7 @@ export function Modal({
     };
   }, [open, onClose]);
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
   if (!open) return null;
 
   return (
@@ -68,7 +70,11 @@ export function Modal({
     >
       <div
         ref={panelRef}
-        style={panelStyle}
+        style={
+          isMobile
+            ? { ...panelStyle, minWidth: "auto", width: "calc(100vw - 2rem)", margin: "1rem", padding: "1rem" }
+            : panelStyle
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {title && (

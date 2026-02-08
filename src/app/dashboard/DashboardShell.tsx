@@ -1,5 +1,7 @@
 "use client";
 
+import { useMediaQuery } from "@/lib/useMediaQuery";
+
 const headerStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
@@ -11,16 +13,16 @@ const headerStyle: React.CSSProperties = {
   WebkitBackdropFilter: "blur(20px)",
 };
 
-const appNameStyle: React.CSSProperties = {
-  fontSize: "1.125rem",
-  fontWeight: 600,
-  color: "#fafafa",
-};
-
 const mainStyle: React.CSSProperties = {
   padding: "1.5rem",
   maxWidth: "1400px",
   margin: "0 auto",
+};
+
+const appNameStyle: React.CSSProperties = {
+  fontSize: "1.125rem",
+  fontWeight: 600,
+  color: "#fafafa",
 };
 
 export function DashboardShell({
@@ -30,13 +32,24 @@ export function DashboardShell({
   children: React.ReactNode;
   logout: React.ReactNode;
 }) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   return (
     <div>
-      <header style={headerStyle}>
-        <span style={appNameStyle}>Hydra Agents Admin</span>
+      <header
+        style={isMobile ? { ...headerStyle, padding: "0.75rem 1rem" } : headerStyle}
+      >
+        <span
+          style={isMobile ? { ...appNameStyle, fontSize: "1rem" } : appNameStyle}
+        >
+          Hydra Agents Admin
+        </span>
         <div>{logout}</div>
       </header>
-      <main style={mainStyle}>{children}</main>
+      <main
+        style={isMobile ? { ...mainStyle, padding: "1rem" } : mainStyle}
+      >
+        {children}
+      </main>
     </div>
   );
 }
