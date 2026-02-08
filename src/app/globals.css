@@ -57,6 +57,18 @@ textarea:focus-visible {
   animation: hydra-modal-panel-in 0.2s ease;
 }
 
+/* Modal content: no horizontal overflow, border-box so padding doesn't cause overflow */
+.hydra-modal-panel,
+.hydra-modal-panel * {
+  box-sizing: border-box;
+}
+
+.hydra-modal-panel input,
+.hydra-modal-panel select,
+.hydra-modal-panel textarea {
+  max-width: 100%;
+}
+
 @keyframes hydra-spin {
   to {
     transform: rotate(360deg);

@@ -41,6 +41,7 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
+  maxWidth: "100%",
   padding: "0.5rem 0.5rem",
   fontSize: "0.875rem",
   background: "rgba(10, 10, 10, 0.6)",
@@ -48,6 +49,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: "8px",
   color: "#fafafa",
   transition: "150ms ease",
+  boxSizing: "border-box",
 };
 
 type Row = Record<string, unknown>;
@@ -66,11 +68,19 @@ export function TaskFormFields({
   let first = true;
 
   const gridStyle = isMobile
-    ? { ...formGridStyle, gridTemplateColumns: "1fr", gap: "1rem" }
+    ? {
+        ...formGridStyle,
+        gridTemplateColumns: "1fr",
+        gap: "1rem",
+        minWidth: 0,
+        maxWidth: "100%",
+        boxSizing: "border-box" as const,
+      }
     : formGridStyle;
   const fieldsRowStyle = isMobile
-    ? { display: "grid" as const, gridTemplateColumns: "1fr", gap: "0 0" }
+    ? { display: "grid" as const, gridTemplateColumns: "1fr", gap: "0 0", minWidth: 0 }
     : { display: "grid" as const, gridTemplateColumns: "1fr 1fr", gap: "0 2rem" };
+  const fieldStyleWithMobile = isMobile ? { ...fieldStyle, minWidth: 0, maxWidth: "100%" } : fieldStyle;
 
   return (
     <div style={gridStyle}>
@@ -83,7 +93,7 @@ export function TaskFormFields({
               const ref = first ? firstInputRef : undefined;
               if (first) first = false;
               return (
-                <div key={col} style={fieldStyle}>
+                <div key={col} style={fieldStyleWithMobile}>
                   <label htmlFor={`${mode}-${col}`} style={labelStyle}>
                     {getLabel(col)}
                   </label>

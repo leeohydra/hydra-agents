@@ -39,9 +39,11 @@ const scrollContentStyle: React.CSSProperties = {
   flex: 1,
   minHeight: 0,
   minWidth: 0,
+  maxWidth: "100%",
   scrollbarGutter: "stable",
   paddingLeft: "0.5rem",
   paddingRight: "0.5rem",
+  boxSizing: "border-box",
 };
 
 export function Modal({
@@ -79,7 +81,9 @@ export function Modal({
       style={{
         ...overlayStyle,
         transition: "opacity 150ms ease",
-        ...(isMobile ? { padding: "1rem", boxSizing: "border-box", overflow: "auto" } : {}),
+        ...(isMobile
+          ? { padding: "1rem", boxSizing: "border-box" as const, overflowX: "hidden", overflowY: "auto" }
+          : {}),
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -95,7 +99,7 @@ export function Modal({
           isMobile
             ? {
                 ...panelStyle,
-                minWidth: "auto",
+                minWidth: 0,
                 width: "100%",
                 maxWidth: "100%",
                 margin: 0,
@@ -104,8 +108,10 @@ export function Modal({
                 padding: "1.25rem",
                 paddingLeft: "1.25rem",
                 paddingRight: "max(1.25rem, env(safe-area-inset-right, 1.25rem))",
-                overflow: "visible",
+                overflow: "hidden",
+                overflowX: "hidden",
                 flexShrink: 0,
+                boxSizing: "border-box",
               }
             : { ...panelStyle, overflow: "visible" }
         }
