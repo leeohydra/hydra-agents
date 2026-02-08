@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@/lib/useMediaQuery";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const indicatorStyle: React.CSSProperties = {
   margin: "0 0 0.75rem 0",
@@ -29,6 +31,16 @@ export function DashboardViewControl({
 }) {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [view]);
+
+  function handleToggle() {
+    setIsLoading(true);
+    router.push(view === "30days" ? "/dashboard?view=all" : "/dashboard");
+  }
 
   return (
     <div>
@@ -50,16 +62,29 @@ export function DashboardViewControl({
       </p>
       <button
         type="button"
+        disabled={isLoading}
         style={
           isMobile
-            ? { ...buttonStyle, padding: "0.25rem 0.5rem", fontSize: "0.75rem" }
-            : buttonStyle
+            ? {
+                ...buttonStyle,
+                padding: "0.25rem 0.5rem",
+                fontSize: "0.75rem",
+                ...(isLoading ? { opacity: 0.7, cursor: "wait" } : {}),
+              }
+            : { ...buttonStyle, ...(isLoading ? { opacity: 0.7, cursor: "wait" } : {}) }
         }
-        onClick={() => {
-          router.push(view === "30days" ? "/dashboard?view=all" : "/dashboard");
-        }}
+        onClick={handleToggle}
       >
-        {view === "30days" ? "Show all records" : "Last 30 days"}
+        {isLoading ? (
+          <>
+            <LoadingSpinner size={0.8} />
+            Loading…
+          </>
+        ) : view === "30days" ? (
+          "Show all records"
+        ) : (
+          "Last 30 days"
+        )}
       </button>
     </div>
   );
