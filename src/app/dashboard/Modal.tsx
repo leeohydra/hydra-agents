@@ -20,6 +20,8 @@ const panelStyle: React.CSSProperties = {
   backdropFilter: "blur(24px)",
   WebkitBackdropFilter: "blur(24px)",
   padding: "1.5rem",
+  paddingLeft: "1.5rem",
+  paddingRight: "1.5rem",
   minWidth: "560px",
   maxWidth: "min(90vw, 720px)",
   maxHeight: "90vh",
@@ -36,6 +38,10 @@ const scrollContentStyle: React.CSSProperties = {
   overflowX: "hidden",
   flex: 1,
   minHeight: 0,
+  minWidth: 0,
+  scrollbarGutter: "stable",
+  paddingLeft: "0.5rem",
+  paddingRight: "0.5rem",
 };
 
 export function Modal({
@@ -86,9 +92,15 @@ export function Modal({
             ? {
                 ...panelStyle,
                 minWidth: "auto",
-                width: "calc(100vw - 2rem)",
-                margin: "1rem",
-                padding: "1rem",
+                width: "calc(100% - 3rem)",
+                maxWidth: "calc(100vw - 3rem)",
+                marginLeft: "1.5rem",
+                marginRight: "1.5rem",
+                marginTop: "1rem",
+                marginBottom: "1rem",
+                padding: "1.25rem",
+                paddingLeft: "1.25rem",
+                paddingRight: "max(1.25rem, env(safe-area-inset-right, 1.25rem))",
                 overflow: "visible",
               }
             : { ...panelStyle, overflow: "visible" }
