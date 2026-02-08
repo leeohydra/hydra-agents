@@ -41,7 +41,7 @@ export function DashboardShell({
         <span
           style={isMobile ? { ...appNameStyle, fontSize: "1rem" } : appNameStyle}
         >
-          Hydra Agents Admin
+          Admin Panel
         </span>
         <div>{logout}</div>
       </header>
