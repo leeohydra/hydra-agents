@@ -76,7 +76,11 @@ export function Modal({
   return (
     <div
       className="hydra-modal-overlay"
-      style={{ ...overlayStyle, transition: "opacity 150ms ease" }}
+      style={{
+        ...overlayStyle,
+        transition: "opacity 150ms ease",
+        ...(isMobile ? { padding: "1rem", boxSizing: "border-box", overflow: "auto" } : {}),
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -92,16 +96,16 @@ export function Modal({
             ? {
                 ...panelStyle,
                 minWidth: "auto",
-                width: "calc(100% - 3rem)",
-                maxWidth: "calc(100vw - 3rem)",
-                marginLeft: "1.5rem",
-                marginRight: "1.5rem",
-                marginTop: "1rem",
-                marginBottom: "1rem",
+                width: "100%",
+                maxWidth: "100%",
+                margin: 0,
+                marginTop: "auto",
+                marginBottom: "auto",
                 padding: "1.25rem",
                 paddingLeft: "1.25rem",
                 paddingRight: "max(1.25rem, env(safe-area-inset-right, 1.25rem))",
                 overflow: "visible",
+                flexShrink: 0,
               }
             : { ...panelStyle, overflow: "visible" }
         }
