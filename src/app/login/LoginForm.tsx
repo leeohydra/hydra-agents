@@ -22,27 +22,32 @@ const fieldStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontSize: "0.875rem",
   fontWeight: 500,
-  color: "#a3a3a3",
+  color: "#fafafa",
 };
 
 const inputStyle: React.CSSProperties = {
-  padding: "0.5rem 0.75rem",
+  width: "100%",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+  padding: "0.625rem 0.75rem",
   fontSize: "0.9375rem",
-  background: "rgba(10, 10, 10, 0.6)",
-  border: "1px solid #404040",
-  borderRadius: "8px",
+  background: "#262626",
+  border: "1px solid rgba(64, 64, 64, 0.6)",
+  borderRadius: "10px",
   color: "#fafafa",
   outline: "none",
+  transition: "150ms ease",
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  padding: "0.625rem 1rem",
+  width: "100%",
+  padding: "0.75rem 1rem",
   fontSize: "0.9375rem",
-  fontWeight: 500,
+  fontWeight: 600,
   background: ACCENT,
   color: "#fff",
   border: "none",
-  borderRadius: "8px",
+  borderRadius: "10px",
   cursor: "pointer",
   marginTop: "0.25rem",
   transition: "150ms ease",

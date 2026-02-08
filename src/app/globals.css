@@ -84,3 +84,35 @@ textarea:focus-visible {
 .hydra-search-input::placeholder {
   color: #737373;
 }
+
+/* Login page: grid background and glow */
+.hydra-login-page {
+  position: relative;
+  min-height: 100vh;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+.hydra-login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(38, 38, 38, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 38, 38, 0.6) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.4) 50%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.4) 50%, transparent 80%);
+  pointer-events: none;
+}
+
+.hydra-login-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.35), rgba(147, 197, 253, 0.5), rgba(147, 197, 253, 0.35), transparent);
+  filter: blur(8px);
+  pointer-events: none;
+}

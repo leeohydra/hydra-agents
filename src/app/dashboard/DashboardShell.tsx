@@ -41,7 +41,6 @@ export function DashboardShell({
         <span
           style={isMobile ? { ...appNameStyle, fontSize: "1rem" } : appNameStyle}
         >
-          Admin Panel
         </span>
         <div>{logout}</div>
       </header>
