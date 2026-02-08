@@ -59,16 +59,59 @@ const errorStyle: React.CSSProperties = {
   margin: 0,
 };
 
+const successStyle: React.CSSProperties = {
+  fontSize: "0.875rem",
+  color: "#86efac",
+  margin: 0,
+};
+
+const forgotLinkStyle: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  padding: 0,
+  fontSize: "0.8125rem",
+  color: "#a3a3a3",
+  cursor: "pointer",
+  textDecoration: "underline",
+  alignSelf: "flex-start",
+};
+
 export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  async function handleForgotPassword() {
+    setError(null);
+    setSuccessMessage(null);
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setError("Enter your email above to reset password.");
+      return;
+    }
+    setIsResetting(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (resetError) {
+        setError(resetError.message);
+        return;
+      }
+      setSuccessMessage("Check your email for the reset link.");
+    } finally {
+      setIsResetting(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     setIsLoading(true);
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -109,8 +152,20 @@ export function LoginForm() {
           required
           style={inputStyle}
         />
+        <button
+          type="button"
+          onClick={handleForgotPassword}
+          disabled={isResetting}
+          style={{
+            ...forgotLinkStyle,
+            ...(isResetting ? { opacity: 0.6, cursor: "wait" } : {}),
+          }}
+        >
+          {isResetting ? "Sending…" : "Forgot password?"}
+        </button>
       </div>
       {error && <p style={errorStyle}>{error}</p>}
+      {successMessage && <p style={successStyle}>{successMessage}</p>}
       <button
         type="submit"
         className="hydra-btn-primary"
