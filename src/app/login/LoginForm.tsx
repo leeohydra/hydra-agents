@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+
+const ACCENT = "#3b82f6";
 
 const formStyle: React.CSSProperties = {
   display: "flex",
@@ -36,12 +39,13 @@ const primaryButtonStyle: React.CSSProperties = {
   padding: "0.625rem 1rem",
   fontSize: "0.9375rem",
   fontWeight: 500,
-  background: "#fafafa",
-  color: "#0a0a0a",
+  background: ACCENT,
+  color: "#fff",
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
   marginTop: "0.25rem",
+  transition: "150ms ease",
 };
 
 const errorStyle: React.CSSProperties = {
@@ -55,20 +59,26 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (signInError) {
-      setError(signInError.message);
-      return;
+    setIsLoading(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+      router.push("/dashboard");
+      router.refresh();
+    } finally {
+      setIsLoading(false);
     }
-    router.push("/dashboard");
-    router.refresh();
   }
 
   return (
@@ -96,7 +106,24 @@ export function LoginForm() {
         />
       </div>
       {error && <p style={errorStyle}>{error}</p>}
-      <button type="submit" style={primaryButtonStyle}>Sign in</button>
+      <button
+        type="submit"
+        className="hydra-btn-primary"
+        disabled={isLoading}
+        style={{
+          ...primaryButtonStyle,
+          ...(isLoading ? { opacity: 0.8, cursor: "wait" } : {}),
+        }}
+      >
+        {isLoading ? (
+          <>
+            <LoadingSpinner size={0.9} />
+            Signing in…
+          </>
+        ) : (
+          "Sign in"
+        )}
+      </button>
     </form>
   );
 }

@@ -47,6 +47,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid #404040",
   borderRadius: "8px",
   color: "#fafafa",
+  transition: "150ms ease",
 };
 
 type Row = Record<string, unknown>;

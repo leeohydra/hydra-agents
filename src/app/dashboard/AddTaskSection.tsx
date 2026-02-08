@@ -3,20 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { addTask } from "./actions";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { toDateInputValue } from "@/lib/format";
 import { FORM_COLUMNS } from "@/lib/taskColumns";
 import { Modal } from "./Modal";
 import { TaskFormFields } from "./TaskFormFields";
 
+const ACCENT = "#3b82f6";
+
 const primaryButtonStyle: React.CSSProperties = {
   padding: "0.5rem 1rem",
   fontSize: "0.875rem",
   fontWeight: 500,
-  background: "#fafafa",
-  color: "#0a0a0a",
+  background: ACCENT,
+  color: "#fff",
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
+  transition: "150ms ease",
 };
 
 const formActionsStyle: React.CSSProperties = {
@@ -75,6 +79,7 @@ export function AddTaskSection() {
     <div style={isMobile ? { width: "100%" } : undefined}>
       <button
         type="button"
+        className="hydra-btn-primary"
         onClick={() => setShowForm(true)}
         style={isMobile ? { ...primaryButtonStyle, width: "100%", padding: "0.5rem 1rem" } : primaryButtonStyle}
       >
@@ -115,15 +120,23 @@ export function AddTaskSection() {
           >
             <button
               type="submit"
+              className="hydra-btn-primary"
               disabled={isSaving || !isDirty}
               style={{
                 ...primaryButtonStyle,
                 ...(isSaving || !isDirty
-                  ? { opacity: 0.5, cursor: "not-allowed" }
+                  ? { opacity: 0.6, cursor: isSaving ? "wait" : "not-allowed" }
                   : {}),
               }}
             >
-              {isSaving ? "Saving…" : "Save"}
+              {isSaving ? (
+                <>
+                  <LoadingSpinner size={0.85} />
+                  Saving…
+                </>
+              ) : (
+                "Save"
+              )}
             </button>
             <button
               type="button"
@@ -137,6 +150,7 @@ export function AddTaskSection() {
                 border: "1px solid #404040",
                 borderRadius: "8px",
                 cursor: "pointer",
+                transition: "150ms ease",
               }}
             >
               Dismiss

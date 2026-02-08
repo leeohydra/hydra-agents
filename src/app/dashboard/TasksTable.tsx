@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { formatDate, formatDateTime, toDateInputValue } from "@/lib/format";
 import { COLUMN_LABELS, FORM_COLUMNS } from "@/lib/taskColumns";
 import { updateTask, deleteTask } from "./actions";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Modal } from "./Modal";
 import { TaskFormFields } from "./TaskFormFields";
 
@@ -40,6 +41,7 @@ const actionsButtonStyle: React.CSSProperties = {
   color: "#fafafa",
   border: "1px solid #404040",
   borderRadius: "8px",
+  transition: "150ms ease",
 };
 
 const actionsMenuStyle: React.CSSProperties = {
@@ -98,15 +100,18 @@ const formActionsStyle: React.CSSProperties = {
   gap: "0.5rem",
 };
 
+const ACCENT = "#3b82f6";
+
 const primaryButtonStyle: React.CSSProperties = {
   padding: "0.5rem 1rem",
   fontSize: "0.875rem",
   fontWeight: 500,
-  background: "#fafafa",
-  color: "#0a0a0a",
+  background: ACCENT,
+  color: "#fff",
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
+  transition: "150ms ease",
 };
 
 export function TasksTable({
@@ -135,6 +140,12 @@ export function TasksTable({
   const menuRef = useRef<HTMLDivElement>(null);
   const deploySortMenuRef = useRef<HTMLDivElement>(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (view !== "all") setSearchQuery("");
+  }, [view]);
+
   const sortedRows = useMemo(() => {
     if (view !== "all" || !sort || !rows.length) return rows;
     const col = "deployment_date";
@@ -144,6 +155,18 @@ export function TasksTable({
       return sort === "newest" ? vb - va : va - vb;
     });
   }, [rows, view, sort]);
+
+  const filteredRows = useMemo(() => {
+    if (!searchQuery.trim()) return sortedRows;
+    const q = searchQuery.toLowerCase().trim();
+    return sortedRows.filter((row) =>
+      columns.some((col) => {
+        const v = row[col];
+        if (v == null) return false;
+        return String(v).toLowerCase().includes(q);
+      })
+    );
+  }, [sortedRows, searchQuery, columns]);
 
   useEffect(() => {
     if (editingRow && firstEditInputRef.current) {
@@ -197,6 +220,8 @@ export function TasksTable({
         pay: fd.get("pay") as string,
       });
       setIsDirty(false);
+      setEditingRow(null);
+      router.push("/dashboard?saved=1");
       router.refresh();
     } finally {
       setIsSaving(false);
@@ -252,6 +277,29 @@ export function TasksTable({
 
   return (
     <>
+      {view === "all" && (
+        <div style={{ marginBottom: "1rem" }}>
+          <input
+            type="search"
+            placeholder="Search tasks…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search tasks"
+            style={{
+              width: isMobile ? "100%" : "min(20rem, 100%)",
+              padding: isMobile ? "0.5rem 0.75rem" : "0.5rem 0.75rem",
+              fontSize: isMobile ? "0.875rem" : "0.875rem",
+              background: "rgba(10, 10, 10, 0.6)",
+              border: "1px solid #404040",
+              borderRadius: "8px",
+              color: "#fafafa",
+              outline: "none",
+              transition: "150ms ease",
+            }}
+            className="hydra-search-input"
+          />
+        </div>
+      )}
       <Modal
         open={!!editingRow}
         onClose={() => !isSaving && setEditingRow(null)}
@@ -292,15 +340,23 @@ export function TasksTable({
             >
               <button
                 type="submit"
+                className="hydra-btn-primary"
                 disabled={isSaving || !isDirty}
                 style={{
                   ...primaryButtonStyle,
                   ...(isSaving || !isDirty
-                    ? { opacity: 0.5, cursor: "not-allowed" }
+                    ? { opacity: 0.6, cursor: isSaving ? "wait" : "not-allowed" }
                     : {}),
                 }}
               >
-                {isSaving ? "Saving…" : "Save"}
+                {isSaving ? (
+                  <>
+                    <LoadingSpinner size={0.85} />
+                    Saving…
+                  </>
+                ) : (
+                  "Save"
+                )}
               </button>
               <button
                 type="button"
@@ -314,6 +370,7 @@ export function TasksTable({
                   border: "1px solid #404040",
                   borderRadius: "8px",
                   cursor: "pointer",
+                  transition: "150ms ease",
                 }}
               >
                 Dismiss
@@ -399,24 +456,42 @@ export function TasksTable({
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 && (
+          {filteredRows.length === 0 && (
             <tr>
               <td
                 colSpan={columns.length + 1}
-                style={{ ...tableCellStyle, color: "#a3a3a3", textAlign: "center", padding: "2rem" }}
+                style={{
+                  ...tableCellStyle,
+                  color: "#a3a3a3",
+                  textAlign: "center",
+                  padding: isMobile ? "2rem 1rem" : "2rem",
+                  verticalAlign: "middle",
+                }}
               >
-                No records found
+                {rows.length === 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "center" }}>
+                    <span style={{ fontSize: isMobile ? "0.9rem" : "1rem" }}>
+                      No records yet. Use the Add task button above to create your first task.
+                    </span>
+                  </div>
+                ) : (
+                  <span>No matching records for &quot;{searchQuery}&quot;</span>
+                )}
               </td>
             </tr>
           )}
-          {sortedRows.map((row, i) => {
+          {filteredRows.map((row, i) => {
             const rowKey =
               typeof row.id === "string" || typeof row.id === "number"
                 ? row.id
                 : i;
             const menuOpen = openMenuKey === rowKey;
             return (
-              <tr key={rowKey} style={{ background: i % 2 === 0 ? "#0a0a0a" : "#171717" }}>
+              <tr
+                key={rowKey}
+                className="hydra-table-row"
+                style={{ background: i % 2 === 0 ? "#0a0a0a" : "#171717", transition: "background 150ms ease" }}
+              >
                 {columns.map((col) => (
                   <td
                     key={col}

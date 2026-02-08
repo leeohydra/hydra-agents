@@ -17,12 +17,15 @@ const buttonStyle: React.CSSProperties = {
   border: "1px solid #404040",
   borderRadius: "8px",
   cursor: "pointer",
+  transition: "150ms ease",
 };
 
 export function DashboardViewControl({
   view,
+  recordCount = 0,
 }: {
   view: "30days" | "all";
+  recordCount?: number;
 }) {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -39,6 +42,11 @@ export function DashboardViewControl({
         {view === "30days"
           ? "Showing records from the last 30 days"
           : "Showing all records"}
+        {recordCount > 0 && (
+          <span style={{ marginLeft: "0.5rem", color: "#737373" }}>
+            ({recordCount} {recordCount === 1 ? "record" : "records"})
+          </span>
+        )}
       </p>
       <button
         type="button"

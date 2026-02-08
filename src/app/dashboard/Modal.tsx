@@ -23,10 +23,19 @@ const panelStyle: React.CSSProperties = {
   minWidth: "560px",
   maxWidth: "min(90vw, 720px)",
   maxHeight: "90vh",
-  overflow: "auto",
+  display: "flex",
+  flexDirection: "column",
+  boxSizing: "border-box",
   borderRadius: "12px",
   border: "1px solid rgba(64, 64, 64, 0.5)",
   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.6)",
+};
+
+const scrollContentStyle: React.CSSProperties = {
+  overflowY: "auto",
+  overflowX: "hidden",
+  flex: 1,
+  minHeight: 0,
 };
 
 export function Modal({
@@ -60,7 +69,8 @@ export function Modal({
 
   return (
     <div
-      style={overlayStyle}
+      className="hydra-modal-overlay"
+      style={{ ...overlayStyle, transition: "opacity 150ms ease" }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -70,10 +80,18 @@ export function Modal({
     >
       <div
         ref={panelRef}
+        className="hydra-modal-panel"
         style={
           isMobile
-            ? { ...panelStyle, minWidth: "auto", width: "calc(100vw - 2rem)", margin: "1rem", padding: "1rem" }
-            : panelStyle
+            ? {
+                ...panelStyle,
+                minWidth: "auto",
+                width: "calc(100vw - 2rem)",
+                margin: "1rem",
+                padding: "1rem",
+                overflow: "visible",
+              }
+            : { ...panelStyle, overflow: "visible" }
         }
         onClick={(e) => e.stopPropagation()}
       >
@@ -84,6 +102,7 @@ export function Modal({
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: "1rem",
+              flexShrink: 0,
             }}
           >
             <h2 id="modal-title" style={{ margin: 0, fontSize: "1.25rem", color: "#fafafa" }}>
@@ -107,7 +126,7 @@ export function Modal({
             </button>
           </div>
         )}
-        {children}
+        <div style={scrollContentStyle}>{children}</div>
       </div>
     </div>
   );

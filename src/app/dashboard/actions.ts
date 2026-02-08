@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase/supabaseServer";
 
 export async function addTask(form: {
@@ -31,6 +32,7 @@ export async function addTask(form: {
   };
   const { error } = await supabase.from("tasks").insert(record);
   if (error) throw error;
+  revalidatePath("/dashboard");
   redirect("/dashboard?saved=1");
 }
 
@@ -75,11 +77,13 @@ export async function updateTask(
   const record = toRecord(form);
   const { error } = await supabase.from("tasks").update(record).eq("id", id);
   if (error) throw error;
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
 export async function deleteTask(id: string | number) {
   const { error } = await supabase.from("tasks").delete().eq("id", id);
   if (error) throw error;
+  revalidatePath("/dashboard");
   redirect("/dashboard");
 }

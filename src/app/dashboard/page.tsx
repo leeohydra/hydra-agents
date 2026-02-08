@@ -42,7 +42,7 @@ export default async function DashboardPage({
     <DashboardShell logout={<LogoutButton />}>
       <DashboardPageBar title="Tasks" actions={<AddTaskSection />} />
       {params.saved === "1" && <FlashMessage />}
-      <DashboardViewControl view={view} />
+      <DashboardViewControl view={view} recordCount={rows.length} />
       <DashboardTableWrapper>
         <TasksTable
           rows={rows}
