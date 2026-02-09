@@ -29,6 +29,11 @@ export async function middleware(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // ✅ Allow password reset page without login
+    if (request.nextUrl.pathname.startsWith("/reset-password")) {
+      return response;
+    }
+
     if (request.nextUrl.pathname === "/login") {
       if (user) {
         const r = NextResponse.redirect(new URL("/dashboard", request.url));
