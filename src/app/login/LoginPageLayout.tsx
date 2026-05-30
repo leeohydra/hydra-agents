@@ -77,8 +77,8 @@ export function LoginPageLayout({
               : brandingStyle
           }
         >
-          <p style={brandingTitleStyle}>HYDRA • ADMIN CONSOLE</p>
-          <p style={brandingSubtitleStyle}>Internal Operations</p>
+          <p style={brandingTitleStyle}>HYDRA AGENTS</p>
+          <p style={brandingSubtitleStyle}>Admin Console</p>
         </div>
         <div
           style={

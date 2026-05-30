@@ -9,7 +9,7 @@ import { FORM_COLUMNS } from "@/lib/taskColumns";
 import { Modal } from "./Modal";
 import { TaskFormFields } from "./TaskFormFields";
 
-const ACCENT = "#3b82f6";
+const ACCENT = "#6366f1";
 
 const primaryButtonStyle: React.CSSProperties = {
   padding: "0.5rem 1rem",

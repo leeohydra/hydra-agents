@@ -106,7 +106,7 @@ const formActionsStyle: React.CSSProperties = {
   gap: "0.5rem",
 };
 
-const ACCENT = "#3b82f6";
+const ACCENT = "#6366f1";
 
 const primaryButtonStyle: React.CSSProperties = {
   padding: "0.5rem 1rem",
@@ -284,7 +284,30 @@ export function TasksTable({
     whiteSpace: "nowrap",
     background: "var(--surface-2)",
     borderBottom: "1px solid var(--border-strong)",
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
   });
+
+  // Cap individual cell width so long values (e.g. Pay notes) don't blow
+  // out the table; full text is available via the title tooltip.
+  const maxColWidth: Record<string, number> = {
+    project: 200,
+    pay: 220,
+    inquiry_via: 160,
+    contacts: 160,
+    dd_doc: 140,
+  };
+  const cellClampStyle = (col: string): React.CSSProperties => {
+    const w = maxColWidth[col];
+    if (!w) return {};
+    return {
+      maxWidth: `${w}px`,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    };
+  };
 
   return (
     <>
@@ -463,7 +486,7 @@ export function TasksTable({
                 </th>
               );
             })}
-            <th style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: "var(--surface-2)", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", fontWeight: 600, fontSize: "0.6875rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#8b8b94", borderBottom: "1px solid var(--border-strong)" }}>Actions</th>
+            <th style={{ ...tableCellStyle, ...actionsColumnBaseStyle, top: 0, zIndex: 3, background: "var(--surface-2)", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", fontWeight: 600, fontSize: "0.6875rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#8b8b94", borderBottom: "1px solid var(--border-strong)" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -503,18 +526,23 @@ export function TasksTable({
                 className="hydra-table-row"
                 style={{ background: i % 2 === 0 ? "var(--surface)" : "#101014", transition: "background 150ms ease" }}
               >
-                {columns.map((col) => (
-                  <td
-                    key={col}
-                    style={{
-                      ...tableCellStyle,
-                      fontSize: secondaryColumns.includes(col) ? "0.8125rem" : undefined,
-                      color: secondaryColumns.includes(col) ? "#a3a3a3" : "#fafafa",
-                    }}
-                  >
-                    {cellDisplayValue(col, row[col], secondaryColumns)}
-                  </td>
-                ))}
+                {columns.map((col) => {
+                  const text = cellDisplayValue(col, row[col], secondaryColumns);
+                  return (
+                    <td
+                      key={col}
+                      title={text || undefined}
+                      style={{
+                        ...tableCellStyle,
+                        ...cellClampStyle(col),
+                        fontSize: secondaryColumns.includes(col) ? "0.8125rem" : undefined,
+                        color: secondaryColumns.includes(col) ? "#a3a3a3" : "#fafafa",
+                      }}
+                    >
+                      {text}
+                    </td>
+                  );
+                })}
                 <td style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: i % 2 === 0 ? "var(--surface)" : "#101014", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", zIndex: menuOpen ? 100 : 1 }}>
                   <div
                     ref={menuOpen ? menuRef : undefined}

@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/supabaseClient";
 import { LoginPageLayout } from "@/app/login/LoginPageLayout";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-const ACCENT = "#3b82f6";
+const ACCENT = "#6366f1";
 
 const formStyle: React.CSSProperties = {
   display: "flex",

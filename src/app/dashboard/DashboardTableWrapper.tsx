@@ -21,8 +21,12 @@ export function DashboardTableWrapper({
       <div
         style={
           isMobile
-            ? { overflowX: "auto", WebkitOverflowScrolling: "touch" }
-            : { overflowX: "auto" }
+            ? {
+                overflow: "auto",
+                WebkitOverflowScrolling: "touch",
+                maxHeight: "calc(100dvh - 220px)",
+              }
+            : { overflow: "auto", maxHeight: "calc(100vh - 240px)" }
         }
       >
         {children}

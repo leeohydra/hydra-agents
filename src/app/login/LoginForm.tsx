@@ -5,7 +5,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-const ACCENT = "#3b82f6";
+const ACCENT = "#6366f1";
 
 const formStyle: React.CSSProperties = {
   display: "flex",

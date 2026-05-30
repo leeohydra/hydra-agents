@@ -1,5 +1,10 @@
 import { Inter } from "next/font/google";
 
+export const metadata = {
+  title: "Hydra Agents — Admin",
+  description: "Hydra Agents internal operations admin console.",
+};
+
 export const viewport = {
   width: "device-width",
   initialScale: 1,

@@ -8,9 +8,9 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 const logoutStyle: React.CSSProperties = {
   padding: "0.375rem 0.75rem",
   fontSize: "0.875rem",
-  background: "#dc2626",
-  color: "#fff",
-  border: "none",
+  background: "transparent",
+  color: "var(--muted)",
+  border: "1px solid var(--border-strong)",
   borderRadius: "8px",
   cursor: "pointer",
   transition: "150ms ease",
@@ -36,6 +36,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleClick}
       disabled={isLoading}
+      className="hydra-btn-ghost"
       style={{ ...logoutStyle, ...(isLoading ? { opacity: 0.7, cursor: "wait" } : {}) }}
     >
       {isLoading ? (
