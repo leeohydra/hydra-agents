@@ -61,18 +61,18 @@ export function DashboardViewControl({
   view,
   recordCount = 0,
 }: {
-  view: "30days" | "all";
+  view: "latest30" | "all";
   recordCount?: number;
 }) {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [pending, setPending] = useState<null | "30days" | "all">(null);
+  const [pending, setPending] = useState<null | "latest30" | "all">(null);
 
   useEffect(() => {
     setPending(null);
   }, [view]);
 
-  function go(target: "30days" | "all") {
+  function go(target: "latest30" | "all") {
     if (target === view || pending) return;
     setPending(target);
     router.push(target === "all" ? "/dashboard?view=all" : "/dashboard");
@@ -87,7 +87,7 @@ export function DashboardViewControl({
       }
     >
       <p style={captionStyle}>
-        {view === "30days" ? "Last 30 days" : "All records"}
+        {view === "latest30" ? "Latest 30 records" : "All records"}
         {recordCount > 0 && (
           <span style={countBadgeStyle}>{recordCount}</span>
         )}
@@ -100,13 +100,13 @@ export function DashboardViewControl({
         <button
           type="button"
           role="tab"
-          aria-selected={view === "30days"}
+          aria-selected={view === "latest30"}
           disabled={!!pending}
-          style={segmentStyle(view === "30days")}
-          onClick={() => go("30days")}
+          style={segmentStyle(view === "latest30")}
+          onClick={() => go("latest30")}
         >
-          {pending === "30days" && <LoadingSpinner size={0.75} />}
-          Last 30 days
+          {pending === "latest30" && <LoadingSpinner size={0.75} />}
+          Latest 30
         </button>
         <button
           type="button"

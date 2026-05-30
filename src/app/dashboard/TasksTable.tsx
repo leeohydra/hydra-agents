@@ -132,7 +132,7 @@ export function TasksTable({
   columns: string[];
   columnLabels: Record<string, string>;
   secondaryColumns: string[];
-  view?: "30days" | "all";
+  view?: "latest30" | "all";
   sort?: "newest" | "oldest";
 }) {
   const router = useRouter();

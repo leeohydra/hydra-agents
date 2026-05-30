@@ -19,7 +19,7 @@ export default async function DashboardPage({
   searchParams: Promise<{ saved?: string; view?: string; sort?: string }>;
 }) {
   const params = await searchParams;
-  const view = params.view === "all" ? "all" : "30days";
+  const view = params.view === "all" ? "all" : "latest30";
   const sort =
     params.sort === "oldest"
       ? "oldest"
@@ -27,7 +27,7 @@ export default async function DashboardPage({
         ? "newest"
         : undefined;
   const tasks = await fetchTasks(
-    view === "30days" ? { lastNDays: 30 } : undefined
+    view === "latest30" ? { latestN: 30 } : undefined
   );
   const rows = (tasks ?? []) as Record<string, unknown>[];
   const firstRowKeys = rows.length > 0 ? Object.keys(rows[0]) : [];
