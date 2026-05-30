@@ -1,7 +1,34 @@
 :root {
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
   --transition: 150ms ease;
+
+  --bg: #0a0a0b;
+  --surface: #141417;
+  --surface-2: #1b1b20;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --muted: #a1a1aa;
+  --muted-2: #71717a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a30 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2a2a30;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a3a42;
+  background-clip: padding-box;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -24,8 +51,11 @@ textarea:focus-visible {
 }
 
 /* Table row hover */
-.hydra-table-row:hover {
-  background: rgba(255, 255, 255, 0.03) !important;
+.hydra-table-row {
+  transition: background 120ms ease;
+}
+.hydra-table-row:hover td {
+  background: rgba(99, 102, 241, 0.06) !important;
 }
 
 /* Modal animation */
@@ -75,14 +105,36 @@ textarea:focus-visible {
   }
 }
 
-/* Primary button hover */
+/* Primary button — gradient + depth */
+.hydra-btn-primary {
+  background: linear-gradient(180deg, #6366f1, #4f46e5) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
 .hydra-btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
+  background: linear-gradient(180deg, #818cf8, #6366f1) !important;
+}
+.hydra-btn-primary:active:not(:disabled) {
+  background: linear-gradient(180deg, #4f46e5, #4338ca) !important;
 }
 
-/* Search input placeholder */
+/* Secondary / ghost buttons (view toggle, sort, actions) */
+.hydra-btn-ghost {
+  transition: var(--transition);
+}
+.hydra-btn-ghost:hover:not(:disabled) {
+  border-color: var(--border-strong) !important;
+  color: #fafafa !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Search input placeholder + focus */
 .hydra-search-input::placeholder {
-  color: #737373;
+  color: #6b7280;
+}
+.hydra-search-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
 /* Login page: grid background and glow */

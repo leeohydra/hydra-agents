@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { useRouter } from "next/navigation";
-import { formatDate, formatDateTime, toDateInputValue } from "@/lib/format";
+import {
+  formatDate,
+  formatDateTime,
+  formatRelative,
+  toDateInputValue,
+} from "@/lib/format";
 import { COLUMN_LABELS, FORM_COLUMNS } from "@/lib/taskColumns";
 import { updateTask, deleteTask } from "./actions";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -19,6 +24,7 @@ function cellDisplayValue(
 ): string {
   if (value == null || value === "") return "";
   if (col === "deployment_date") return formatDate(value);
+  if (col === "updated_at") return formatRelative(value);
   if (secondaryColumns.includes(col)) return formatDateTime(value);
   return String(value);
 }
@@ -271,8 +277,13 @@ export function TasksTable({
     ...tableCellStyle,
     textAlign: "left",
     fontWeight: 600,
-    fontSize: secondaryColumns.includes(col) ? "0.8125rem" : "0.875rem",
-    color: "#a3a3a3",
+    fontSize: "0.6875rem",
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    color: "#8b8b94",
+    whiteSpace: "nowrap",
+    background: "var(--surface-2)",
+    borderBottom: "1px solid var(--border-strong)",
   });
 
   return (
@@ -384,7 +395,7 @@ export function TasksTable({
         style={{ width: "100%", borderCollapse: "collapse" }}
       >
         <thead>
-          <tr style={{ background: "#171717" }}>
+          <tr style={{ background: "var(--surface-2)" }}>
             {columns.map((col) => {
               const isDeployDate = col === "deployment_date";
               const canSort = view === "all" && isDeployDate;
@@ -452,7 +463,7 @@ export function TasksTable({
                 </th>
               );
             })}
-            <th style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: "#171717", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", fontWeight: 600, fontSize: "0.875rem", color: "#a3a3a3" }}>Actions</th>
+            <th style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: "var(--surface-2)", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", fontWeight: 600, fontSize: "0.6875rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#8b8b94", borderBottom: "1px solid var(--border-strong)" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -490,7 +501,7 @@ export function TasksTable({
               <tr
                 key={rowKey}
                 className="hydra-table-row"
-                style={{ background: i % 2 === 0 ? "#0a0a0a" : "#171717", transition: "background 150ms ease" }}
+                style={{ background: i % 2 === 0 ? "var(--surface)" : "#101014", transition: "background 150ms ease" }}
               >
                 {columns.map((col) => (
                   <td
@@ -504,7 +515,7 @@ export function TasksTable({
                     {cellDisplayValue(col, row[col], secondaryColumns)}
                   </td>
                 ))}
-                <td style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: i % 2 === 0 ? "#0a0a0a" : "#171717", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", zIndex: menuOpen ? 100 : 1 }}>
+                <td style={{ ...tableCellStyle, ...actionsColumnBaseStyle, background: i % 2 === 0 ? "var(--surface)" : "#101014", boxShadow: "-4px 0 8px rgba(0,0,0,0.3)", zIndex: menuOpen ? 100 : 1 }}>
                   <div
                     ref={menuOpen ? menuRef : undefined}
                     style={{ position: "relative", display: "inline-block" }}

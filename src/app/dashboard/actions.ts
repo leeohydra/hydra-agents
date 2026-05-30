@@ -29,6 +29,7 @@ export async function addTask(form: {
     comms_channel: form.comms_channel ?? null,
     dd_doc: form.dd_doc ?? null,
     pay: form.pay ?? null,
+    updated_at: new Date().toISOString(),
   };
   const { error } = await supabase.from("tasks").insert(record);
   if (error) throw error;
@@ -75,6 +76,7 @@ export async function updateTask(
   }
 ) {
   const record = toRecord(form);
+  record.updated_at = new Date().toISOString();
   const { error } = await supabase.from("tasks").update(record).eq("id", id);
   if (error) throw error;
   revalidatePath("/dashboard");

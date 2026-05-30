@@ -31,7 +31,7 @@ export default async function DashboardPage({
   );
   const rows = (tasks ?? []) as Record<string, unknown>[];
   const firstRowKeys = rows.length > 0 ? Object.keys(rows[0]) : [];
-  const HIDDEN_COLUMNS = ["created_at", "updated_at"];
+  const HIDDEN_COLUMNS = ["created_at"];
   const columns = firstRowKeys.length
     ? COLUMN_ORDER.filter(
         (c) => firstRowKeys.includes(c) && !HIDDEN_COLUMNS.includes(c)
