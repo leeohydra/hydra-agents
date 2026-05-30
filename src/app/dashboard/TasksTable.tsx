@@ -9,7 +9,7 @@ import {
   formatRelative,
   toDateInputValue,
 } from "@/lib/format";
-import { COLUMN_LABELS, FORM_COLUMNS } from "@/lib/taskColumns";
+import { COLUMN_LABELS, FORM_COLUMNS, FORM_FIELD_GROUPS } from "@/lib/taskColumns";
 import { updateTask, deleteTask } from "./actions";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Modal } from "./Modal";
@@ -136,6 +136,7 @@ export function TasksTable({
   sort?: "newest" | "oldest";
 }) {
   const router = useRouter();
+  const [viewingRow, setViewingRow] = useState<Row | null>(null);
   const [editingRow, setEditingRow] = useState<Row | null>(null);
   const [openMenuKey, setOpenMenuKey] = useState<string | number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -252,7 +253,13 @@ export function TasksTable({
   function openEdit(row: Row) {
     setOpenMenuKey(null);
     setIsDirty(false);
+    setViewingRow(null);
     setEditingRow(row);
+  }
+
+  function openView(row: Row) {
+    setOpenMenuKey(null);
+    setViewingRow(row);
   }
 
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -413,6 +420,109 @@ export function TasksTable({
           </form>
         )}
       </Modal>
+      <Modal
+        open={!!viewingRow}
+        onClose={() => setViewingRow(null)}
+        title="Task details"
+      >
+        {viewingRow && (
+          <div>
+            {FORM_FIELD_GROUPS.map((group) => (
+              <div key={group.title} style={{ marginBottom: "1.25rem" }}>
+                <div
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    color: "#8b8b94",
+                    marginBottom: "0.5rem",
+                    paddingBottom: "0.25rem",
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  {group.title}
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                    gap: "0.75rem 2rem",
+                  }}
+                >
+                  {group.fields.map((col) => {
+                    const text = cellDisplayValue(col, viewingRow[col], secondaryColumns);
+                    return (
+                      <div key={col}>
+                        <div
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#8b8b94",
+                            marginBottom: "0.15rem",
+                          }}
+                        >
+                          {getLabel(col)}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.9375rem",
+                            color: text ? "#fafafa" : "#5b5b63",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {text || "—"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                fontSize: "0.75rem",
+                color: "#5b5b63",
+                marginBottom: "1rem",
+              }}
+            >
+              Last updated {formatRelative(viewingRow.updated_at)}
+            </div>
+            <div
+              style={
+                isMobile
+                  ? { ...formActionsStyle, flexDirection: "column" }
+                  : formActionsStyle
+              }
+            >
+              <button
+                type="button"
+                className="hydra-btn-primary"
+                onClick={() => openEdit(viewingRow)}
+                style={primaryButtonStyle}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewingRow(null)}
+                style={{
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.875rem",
+                  background: "transparent",
+                  color: "#a3a3a3",
+                  border: "1px solid #404040",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  transition: "150ms ease",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
       <table
         suppressHydrationWarning
         style={{ width: "100%", borderCollapse: "collapse" }}
@@ -532,9 +642,11 @@ export function TasksTable({
                     <td
                       key={col}
                       title={text || undefined}
+                      onClick={() => openView(row)}
                       style={{
                         ...tableCellStyle,
                         ...cellClampStyle(col),
+                        cursor: "pointer",
                         fontSize: secondaryColumns.includes(col) ? "0.8125rem" : undefined,
                         color: secondaryColumns.includes(col) ? "#a3a3a3" : "#fafafa",
                       }}
@@ -560,6 +672,13 @@ export function TasksTable({
                     </button>
                     {menuOpen && (
                       <div style={actionsMenuStyle}>
+                        <button
+                          type="button"
+                          style={actionsMenuItemStyle}
+                          onClick={() => openView(row)}
+                        >
+                          View
+                        </button>
                         <button
                           type="button"
                           style={actionsMenuItemStyle}
