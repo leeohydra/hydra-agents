@@ -5,13 +5,11 @@ import {
 } from "@/lib/taskColumns";
 import { fetchTasks, TASK_TABLE_COLUMNS } from "@/lib/tasks";
 import { AddTaskSection } from "./AddTaskSection";
+import { DashboardBody } from "./DashboardBody";
 import { DashboardPageBar } from "./DashboardPageBar";
 import { DashboardShell } from "./DashboardShell";
-import { DashboardTableWrapper } from "./DashboardTableWrapper";
-import { DashboardViewControl } from "./DashboardViewControl";
 import { FlashMessage } from "./FlashMessage";
 import { LogoutButton } from "./LogoutButton";
-import { TasksTable } from "./TasksTable";
 
 export default async function DashboardPage({
   searchParams,
@@ -42,17 +40,14 @@ export default async function DashboardPage({
     <DashboardShell logout={<LogoutButton />}>
       <DashboardPageBar title="Tasks" actions={<AddTaskSection />} />
       {params.saved === "1" && <FlashMessage />}
-      <DashboardViewControl view={view} recordCount={rows.length} />
-      <DashboardTableWrapper>
-        <TasksTable
-          rows={rows}
-          columns={columns}
-          columnLabels={COLUMN_LABELS}
-          secondaryColumns={SECONDARY_COLUMNS}
-          view={view}
-          sort={sort}
-        />
-      </DashboardTableWrapper>
+      <DashboardBody
+        rows={rows}
+        columns={columns}
+        columnLabels={COLUMN_LABELS}
+        secondaryColumns={SECONDARY_COLUMNS}
+        view={view}
+        sort={sort}
+      />
     </DashboardShell>
   );
 }

@@ -125,6 +125,7 @@ export function TasksTable({
   secondaryColumns,
   view,
   sort,
+  searchQuery = "",
 }: {
   rows: Row[];
   columns: string[];
@@ -132,6 +133,7 @@ export function TasksTable({
   secondaryColumns: string[];
   view?: "latest30" | "all";
   sort?: "newest" | "oldest";
+  searchQuery?: string;
 }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -150,15 +152,9 @@ export function TasksTable({
   const menuRef = useRef<HTMLDivElement>(null);
   const deploySortMenuRef = useRef<HTMLDivElement>(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (view !== "all") setSearchQuery("");
-  }, [view]);
 
   function toggleMenu(
     rowKey: string | number,
@@ -357,29 +353,6 @@ export function TasksTable({
 
   return (
     <>
-      {view === "all" && (
-        <div style={{ marginBottom: "1rem" }}>
-          <input
-            type="search"
-            placeholder="Search tasks…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search tasks"
-            style={{
-              width: isMobile ? "100%" : "min(20rem, 100%)",
-              padding: isMobile ? "0.5rem 0.75rem" : "0.5rem 0.75rem",
-              fontSize: isMobile ? "0.875rem" : "0.875rem",
-              background: "rgba(10, 10, 10, 0.6)",
-              border: "1px solid #404040",
-              borderRadius: "8px",
-              color: "#fafafa",
-              outline: "none",
-              transition: "150ms ease",
-            }}
-            className="hydra-search-input"
-          />
-        </div>
-      )}
       <Modal
         open={!!editingRow}
         onClose={() => !isSaving && setEditingRow(null)}
