@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { useRouter } from "next/navigation";
 import {
@@ -51,10 +52,7 @@ const actionsButtonStyle: React.CSSProperties = {
 };
 
 const actionsMenuStyle: React.CSSProperties = {
-  position: "absolute",
-  right: 0,
-  bottom: "100%",
-  marginBottom: "2px",
+  position: "fixed",
   background: "rgba(23, 23, 23, 0.95)",
   backdropFilter: "blur(20px)",
   WebkitBackdropFilter: "blur(20px)",
@@ -136,9 +134,14 @@ export function TasksTable({
   sort?: "newest" | "oldest";
 }) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [viewingRow, setViewingRow] = useState<Row | null>(null);
   const [editingRow, setEditingRow] = useState<Row | null>(null);
   const [openMenuKey, setOpenMenuKey] = useState<string | number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(
+    null
+  );
+  const portalMenuRef = useRef<HTMLDivElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -150,8 +153,31 @@ export function TasksTable({
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (view !== "all") setSearchQuery("");
   }, [view]);
+
+  function toggleMenu(
+    rowKey: string | number,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) {
+    if (openMenuKey === rowKey) {
+      setOpenMenuKey(null);
+      setMenuPos(null);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const MENU_HEIGHT = 132;
+    const openUp = rect.bottom + MENU_HEIGHT + 8 > window.innerHeight;
+    setMenuPos({
+      top: openUp ? rect.top - MENU_HEIGHT - 4 : rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    });
+    setOpenMenuKey(rowKey);
+  }
 
   const sortedRows = useMemo(() => {
     if (view !== "all" || !sort || !rows.length) return rows;
@@ -184,13 +210,26 @@ export function TasksTable({
 
   useEffect(() => {
     if (openMenuKey === null) return;
+    function closeMenu() {
+      setOpenMenuKey(null);
+      setMenuPos(null);
+    }
     function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpenMenuKey(null);
-      }
+      const target = e.target as Node;
+      const inTrigger = menuRef.current?.contains(target);
+      const inMenu = portalMenuRef.current?.contains(target);
+      if (!inTrigger && !inMenu) closeMenu();
     }
     document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    // The menu is fixed-positioned to the trigger; once the user scrolls
+    // it would detach, so just close it.
+    window.addEventListener("scroll", closeMenu, true);
+    window.addEventListener("resize", closeMenu);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("scroll", closeMenu, true);
+      window.removeEventListener("resize", closeMenu);
+    };
   }, [openMenuKey]);
 
   useEffect(() => {
@@ -663,39 +702,48 @@ export function TasksTable({
                     <button
                       type="button"
                       style={actionsButtonStyle}
-                      onClick={() => setOpenMenuKey(menuOpen ? null : rowKey)}
+                      onClick={(e) => toggleMenu(rowKey, e)}
                       disabled={isDeleting}
                       aria-expanded={menuOpen}
                       aria-haspopup="true"
                     >
                       Actions ▾
                     </button>
-                    {menuOpen && (
-                      <div style={actionsMenuStyle}>
-                        <button
-                          type="button"
-                          style={actionsMenuItemStyle}
-                          onClick={() => openView(row)}
+                    {menuOpen && menuPos && mounted &&
+                      createPortal(
+                        <div
+                          ref={portalMenuRef}
+                          style={{
+                            ...actionsMenuStyle,
+                            top: menuPos.top,
+                            right: menuPos.right,
+                          }}
                         >
-                          View
-                        </button>
-                        <button
-                          type="button"
-                          style={actionsMenuItemStyle}
-                          onClick={() => openEdit(row)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          style={actionsMenuItemDangerStyle}
-                          onClick={() => handleDelete(row)}
-                          disabled={isDeleting}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
+                          <button
+                            type="button"
+                            style={actionsMenuItemStyle}
+                            onClick={() => openView(row)}
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            style={actionsMenuItemStyle}
+                            onClick={() => openEdit(row)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            style={actionsMenuItemDangerStyle}
+                            onClick={() => handleDelete(row)}
+                            disabled={isDeleting}
+                          >
+                            Delete
+                          </button>
+                        </div>,
+                        document.body
+                      )}
                   </div>
                 </td>
               </tr>
